@@ -49,17 +49,17 @@ class Race(Base):
     # Surface and Conditions
     surface = Column(SQLEnum(SurfaceType), default=SurfaceType.UNKNOWN)
     surface_description = Column(String(50))
-    track_condition = Column(String(50))
+    track_condition = Column(String(100))  # Changed from 50 to 100
 
     # Classification
     race_type = Column(SQLEnum(RaceType), default=RaceType.UNKNOWN)
     race_type_description = Column(String(100))
-    race_class = Column(String(50))
+    race_class = Column(String(200))  # Changed from 50 to 200
     grade = Column(String(10))  # G1, G2, G3 for stakes
 
     # Restrictions
-    age_restriction = Column(String(50))
-    sex_restriction = Column(String(50))
+    age_restriction = Column(String(100))  # Changed from 50 to 100
+    sex_restriction = Column(String(100))  # Changed from 50 to 100
     breed = Column(String(50))
 
     # Claiming
