@@ -12,6 +12,7 @@ from src.config import settings
 from src.models.meets import MeetsResponse
 from src.utils.rate_limiter import RateLimiter
 from src.models.entries import EntriesResponse
+from src.models.results import ResultsResponse
 
 
 logger = logging.getLogger(__name__)
@@ -172,9 +173,9 @@ class RacingAPIClient:
         return meets_response
 
     def save_meets_to_file(
-        self,
-        meets_response: MeetsResponse,
-        filename: Optional[str] = None
+            self,
+            meets_response: MeetsResponse,
+            filename: Optional[str] = None
     ) -> Path:
         """
         Save meets response to JSON file.
@@ -201,7 +202,7 @@ class RacingAPIClient:
 
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(
-                meets_response.model_dump(),
+                meets_response.model_dump(mode='json'),
                 f,
                 indent=2,
                 ensure_ascii=False
@@ -263,13 +264,76 @@ class RacingAPIClient:
 
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(
-                entries_response.model_dump(),
+                entries_response.model_dump(mode='json'),
                 f,
                 indent=2,
                 ensure_ascii=False
             )
 
         logger.info(f"Saved entries data to {filepath}")
+        return filepath
+
+    def get_results(self, meet_id: str) -> ResultsResponse:
+        """
+        Fetch race results for a specific meet.
+
+        Args:
+            meet_id: Meet ID from meets endpoint
+
+        Returns:
+            ResultsResponse with all race results
+        """
+        logger.info(f"Fetching results for meet: {meet_id}")
+
+        # Make request
+        endpoint = f"/meets/{meet_id}/results"
+        data = self._make_request(endpoint)
+
+        # Parse and validate with Pydantic
+        results_response = ResultsResponse(**data)
+
+        logger.info(
+            f"Fetched results for {results_response.total_races} races "
+            f"({results_response.completed_races} completed) "
+            f"for {results_response.track_name}"
+        )
+
+        return results_response
+
+    def save_results_to_file(
+            self,
+            results_response: ResultsResponse,
+            filename: Optional[str] = None
+    ) -> Path:
+        """
+        Save results response to JSON file.
+
+        Args:
+            results_response: ResultsResponse to save
+            filename: Output filename (auto-generated if None)
+
+        Returns:
+            Path to saved file
+        """
+        if filename is None:
+            # Generate filename
+            meet_id = results_response.meet_id
+            track_name = results_response.track_name.replace(" ", "_")
+            filename = f"results_{meet_id}_{track_name}.json"
+
+        # Save to raw data directory
+        filepath = settings.raw_data_dir / filename
+
+        # Use model_dump with mode='json' to handle Decimal serialization
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(
+                results_response.model_dump(mode='json'),
+                f,
+                indent=2,
+                ensure_ascii=False
+            )
+
+        logger.info(f"Saved results data to {filepath}")
         return filepath
 
     def close(self):
