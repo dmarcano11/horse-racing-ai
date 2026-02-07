@@ -11,6 +11,7 @@ import time
 from src.config import settings
 from src.models.meets import MeetsResponse
 from src.utils.rate_limiter import RateLimiter
+from src.models.entries import EntriesResponse
 
 
 logger = logging.getLogger(__name__)
@@ -207,6 +208,68 @@ class RacingAPIClient:
             )
 
         logger.info(f"Saved meets data to {filepath}")
+        return filepath
+
+    def get_entries(self, meet_id: str) -> EntriesResponse:
+        """
+        Fetch race entries for a specific meet.
+
+        Args:
+            meet_id: Meet ID from meets endpoint
+
+        Returns:
+            EntriesResponse with all races and runners
+        """
+        logger.info(f"Fetching entries for meet: {meet_id}")
+
+        # Make request
+        endpoint = f"/meets/{meet_id}/entries"
+        data = self._make_request(endpoint)
+
+        # Parse and validate with Pydantic
+        entries_response = EntriesResponse(**data)
+
+        logger.info(
+            f"Fetched {entries_response.total_races} races "
+            f"with {entries_response.total_runners} total runners "
+            f"for {entries_response.track_name}"
+        )
+
+        return entries_response
+
+    def save_entries_to_file(
+            self,
+            entries_response: EntriesResponse,
+            filename: Optional[str] = None
+    ) -> Path:
+        """
+        Save entries response to JSON file.
+
+        Args:
+            entries_response: EntriesResponse to save
+            filename: Output filename (auto-generated if None)
+
+        Returns:
+            Path to saved file
+        """
+        if filename is None:
+            # Generate filename
+            meet_id = entries_response.meet_id
+            track_name = entries_response.track_name.replace(" ", "_")
+            filename = f"entries_{meet_id}_{track_name}.json"
+
+        # Save to raw data directory
+        filepath = settings.raw_data_dir / filename
+
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(
+                entries_response.model_dump(),
+                f,
+                indent=2,
+                ensure_ascii=False
+            )
+
+        logger.info(f"Saved entries data to {filepath}")
         return filepath
 
     def close(self):
