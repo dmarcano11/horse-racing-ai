@@ -35,12 +35,22 @@ def load_results_from_json(json_path: Path, db: Session) -> int:
 
     for race_data in races_data:
         try:
-            race_number = race_data['race_key']['race_number']
+            race_number = int(race_data['race_key']['race_number'])
 
             # Find the race in database (from entries)
-            race = db.query(Race).join(Race.meet).filter(
-                Race.meet.has(meet_id=meet_id),
-                Race.race_number == int(race_number)
+            # First get the meet
+            from src.db.models import Meet
+
+            meet = db.query(Meet).filter(Meet.meet_id == meet_id).first()
+
+            if not meet:
+                logger.warning(f"Meet {meet_id} not found in database, skipping")
+                continue
+
+            # Now find the race
+            race = db.query(Race).filter(
+                Race.meet_id == meet.id,
+                Race.race_number == race_number
             ).first()
 
             if not race:

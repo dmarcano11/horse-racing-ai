@@ -24,8 +24,14 @@ def parse_decimal_odds(odds_str: Optional[str]) -> Optional[float]:
     """
     Parse fractional odds to decimal.
 
+    Examples:
+        "5/2" -> 2.5
+        "3-1" -> 3.0
+        "EVEN" -> 1.0
+        "6/5" -> 1.2
+
     Args:
-        odds_str: Odds string (e.g., "5/2")
+        odds_str: Odds string
 
     Returns:
         Decimal odds or None
@@ -33,13 +39,37 @@ def parse_decimal_odds(odds_str: Optional[str]) -> Optional[float]:
     if not odds_str:
         return None
 
-    try:
-        if '/' in odds_str:
-            num, denom = odds_str.split('/')
-            return float(num) / float(denom)
-        return float(odds_str)
-    except (ValueError, ZeroDivisionError):
+    odds_str = str(odds_str).strip().upper()
+
+    if not odds_str or odds_str in ['', 'SCR', 'SCRATCHED']:
         return None
+
+    # Handle special cases
+    if odds_str in ['EVEN', 'EVN', '1-1', '1/1']:
+        return 1.0
+
+    # Replace dash with slash for consistency
+    odds_str = odds_str.replace('-', '/')
+
+    # Parse fraction
+    if '/' in odds_str:
+        try:
+            parts = odds_str.split('/')
+            if len(parts) == 2:
+                numerator = float(parts[0].strip())
+                denominator = float(parts[1].strip())
+                if denominator > 0:
+                    return numerator / denominator
+        except (ValueError, ZeroDivisionError):
+            pass
+
+    # Try parsing as decimal
+    try:
+        return float(odds_str)
+    except ValueError:
+        pass
+
+    return None
 
 
 def load_entries_from_json(json_path: Path, db: Session) -> int:
@@ -168,6 +198,15 @@ def load_entries_from_json(json_path: Path, db: Session) -> int:
                     ml_decimal = parse_decimal_odds(runner_data.get('morning_line_odds'))
                     live_decimal = parse_decimal_odds(runner_data.get('live_odds'))
 
+                    # Scratch indicator - interpret properly
+                    # "N" = Not scratched, "Y" = Scratched
+                    scratch_indicator = runner_data.get('scratch_indicator')
+                    is_scratched = False  # Default to not scratched
+
+                    if scratch_indicator:
+                        scratch_str = str(scratch_indicator).strip().upper()
+                        is_scratched = (scratch_str == 'Y')  # Only "Y" means scratched
+
                     # Create runner
                     runner = Runner(
                         race_id=race.id,
@@ -186,8 +225,8 @@ def load_entries_from_json(json_path: Path, db: Session) -> int:
                         claiming_price=runner_data.get('claiming'),
                         equipment=runner_data.get('equipment'),
                         medication=runner_data.get('medication'),
-                        is_scratched=bool(runner_data.get('scratch_indicator')),
-                        scratch_indicator=runner_data.get('scratch_indicator')
+                        is_scratched=is_scratched,
+                        scratch_indicator=scratch_indicator
                     )
 
                     db.add(runner)
