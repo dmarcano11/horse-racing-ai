@@ -20,7 +20,7 @@ def compare_all_models():
     print("=" * 80)
 
     data_prep = DataPreparation()
-    data_path = Path("data/processed/features_sample.csv")
+    data_path = Path("data/processed/features_complete.csv")
     data = data_prep.prepare_ml_data(data_path, train_ratio=0.8, scale=True)
 
     results = {}
