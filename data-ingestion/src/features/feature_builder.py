@@ -95,8 +95,8 @@ class FeatureBuilder:
         features.update(value_features)
 
         # Target variable (if available)
-        features['target_win'] = self._get_target_win(runner)
-        features['target_finish_position'] = self._get_target_finish_position(runner)
+        features['target_win'] = self._get_target_win(runner, race)
+        features['target_finish_position'] = self._get_target_finish_position(runner, race)
 
         return features
 
@@ -169,43 +169,52 @@ class FeatureBuilder:
 
         return pd.concat(all_features, ignore_index=True)
 
-    def _get_target_win(self, runner: Runner) -> float:
+    def _get_target_win(self, runner: Runner, race: Race) -> float:
         """
-        Get target variable: did this horse win?
+        Get win target for runner.
 
-        Args:
-            runner: Runner object
-
-        Returns:
-            1.0 if won, 0.0 if lost, -1.0 if no result
+        Properly assigns:
+        - 1.0 = Won the race (finish_position = 1)
+        - 0.0 = Lost the race (race has results but runner didn't win)
+        - -1.0 = No result available (race not yet run)
         """
-        result = self.db.query(RunnerResult).filter(
-            RunnerResult.runner_id == runner.id
+        # Check if this race has results at all
+        race_result = self.db.query(RaceResult).filter(
+            RaceResult.race_id == race.id
         ).first()
 
-        if not result or result.finish_position is None:
-            return -1.0  # No result available
+        if not race_result:
+            return -1.0  # Race has no results yet
 
-        return 1.0 if result.finish_position == 1 else 0.0
-
-    def _get_target_finish_position(self, runner: Runner) -> float:
-        """
-        Get target variable: finish position.
-
-        Args:
-            runner: Runner object
-
-        Returns:
-            Finish position or -1.0 if no result
-        """
-        result = self.db.query(RunnerResult).filter(
-            RunnerResult.runner_id == runner.id
+        # Race has results - check if this runner won
+        runner_result = self.db.query(RunnerResult).filter(
+            RunnerResult.runner_id == runner.id,
+            RunnerResult.race_result_id == race_result.id
         ).first()
 
-        if not result or result.finish_position is None:
+        if runner_result and runner_result.finish_position == 1:
+            return 1.0  # Winner!
+        else:
+            return 0.0  # Lost (we know race ran, runner didn't win)
+
+    def _get_target_finish_position(self, runner: Runner, race: Race) -> float:
+        """Get finish position target."""
+        race_result = self.db.query(RaceResult).filter(
+            RaceResult.race_id == race.id
+        ).first()
+
+        if not race_result:
             return -1.0
 
-        return float(result.finish_position)
+        runner_result = self.db.query(RunnerResult).filter(
+            RunnerResult.runner_id == runner.id,
+            RunnerResult.race_result_id == race_result.id
+        ).first()
+
+        if runner_result and runner_result.finish_position:
+            return float(runner_result.finish_position)
+        else:
+            return -1.0  # Unknown finish position
 
     def _get_default_jockey_features(self) -> Dict[str, float]:
         """Get default jockey features when jockey is unknown."""
