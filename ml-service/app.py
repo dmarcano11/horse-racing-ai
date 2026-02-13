@@ -94,6 +94,42 @@ def predict_race():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/predict/race/<int:race_id>', methods=['GET'])
+def predict_race_from_db(race_id):
+    """
+    Generate predictions using full feature engineering pipeline.
+    Fetches runner data directly from PostgreSQL.
+
+    This is the preferred endpoint - uses real ML features!
+    """
+    try:
+        logger.info(f"Generating full-feature predictions for race {race_id}")
+        predictions = predictor.predict_race_from_db(race_id)
+
+        if not predictions:
+            return jsonify({
+                'race_id': race_id,
+                'error': 'No runners found or features could not be built'
+            }), 404
+
+        return jsonify({
+            'race_id': race_id,
+            'runner_count': len(predictions),
+            'predictions': predictions,
+            'model': 'RandomForest',
+            'features': 'full_pipeline',
+            'note': 'Predictions using complete 55-feature ML pipeline'
+        })
+
+    except Exception as e:
+        logger.error(f"Full prediction failed for race {race_id}: {e}")
+        return jsonify({
+            'race_id': race_id,
+            'error': str(e),
+            'suggestion': 'Try POST /predict/race for basic predictions'
+        }), 500
+
+
 @app.route('/predict/runner/<int:runner_id>', methods=['GET'])
 def predict_runner(runner_id):
     """
