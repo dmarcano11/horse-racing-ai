@@ -47,7 +47,9 @@ export default function RaceCardPage() {
               {hasResults && <Badge variant="green">Final</Badge>}
             </div>
             <div className="text-slate-300 text-lg">
-              {race.raceName || `Race ${race.raceNumber}`}
+              {race.raceName && race.raceName !== `Race ${race.raceNumber}`
+                ? race.raceName
+                : `${race.trackName} · Race ${race.raceNumber}`}
             </div>
             <div className="text-slate-400 text-sm mt-1">
               {race.trackName} · {race.trackCode}
@@ -101,8 +103,8 @@ export default function RaceCardPage() {
                         border-slate-700 text-xs font-medium text-slate-400
                         uppercase tracking-wider
                         ${hasResults
-                          ? 'grid-cols-12'
-                          : 'grid-cols-10'}`}>
+            ? 'grid-cols-12'
+            : 'grid-cols-10'}`}>
           <div className="col-span-1">#</div>
           <div className="col-span-3">Horse</div>
           <div className="col-span-2">Jockey / Trainer</div>
@@ -120,18 +122,18 @@ export default function RaceCardPage() {
             className={`grid gap-4 px-6 py-4 items-center
                         ${hasResults ? 'grid-cols-12' : 'grid-cols-10'}
                         ${runner.finishPosition === 1
-                          ? 'bg-amber-500/5 border-l-2 border-amber-500'
-                          : ''}
+                ? 'bg-amber-500/5 border-l-2 border-amber-500'
+                : ''}
                         ${idx !== runners.length - 1
-                          ? 'border-b border-slate-700/50' : ''}`}
+                ? 'border-b border-slate-700/50' : ''}`}
           >
             {/* Post Position */}
             <div className="col-span-1">
               <span className={`w-8 h-8 rounded-full flex items-center
                                justify-center text-sm font-bold
                                ${runner.modelRank === 1
-                                 ? 'bg-blue-600 text-white'
-                                 : 'bg-slate-700 text-slate-300'}`}>
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-700 text-slate-300'}`}>
                 {runner.postPosition || runner.programNumber || idx + 1}
               </span>
             </div>
@@ -187,12 +189,12 @@ export default function RaceCardPage() {
                     <span className={`w-6 h-6 rounded-full flex items-center
                                      justify-center text-xs font-bold
                                      ${runner.finishPosition === 1
-                                       ? 'bg-amber-500 text-black'
-                                       : runner.finishPosition === 2
-                                         ? 'bg-slate-400 text-black'
-                                         : runner.finishPosition === 3
-                                           ? 'bg-amber-700 text-white'
-                                           : 'bg-slate-700 text-slate-300'}`}>
+                        ? 'bg-amber-500 text-black'
+                        : runner.finishPosition === 2
+                          ? 'bg-slate-400 text-black'
+                          : runner.finishPosition === 3
+                            ? 'bg-amber-700 text-white'
+                            : 'bg-slate-700 text-slate-300'}`}>
                       {runner.finishPosition}
                     </span>
                     {runner.winPayoff && (
@@ -217,8 +219,8 @@ export default function RaceCardPage() {
         return (
           <div className={`rounded-xl border p-4 flex items-center gap-3
                           ${modelPicked
-                            ? 'bg-green-500/10 border-green-500/30'
-                            : 'bg-slate-800 border-slate-700'}`}>
+              ? 'bg-green-500/10 border-green-500/30'
+              : 'bg-slate-800 border-slate-700'}`}>
             <span className="text-2xl">{modelPicked ? '✅' : '❌'}</span>
             <div>
               <div className={`font-semibold
