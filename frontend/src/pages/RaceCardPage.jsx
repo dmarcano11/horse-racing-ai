@@ -4,6 +4,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 import ErrorMessage from '../components/ui/ErrorMessage'
 import Badge from '../components/ui/Badge'
 import ProbabilityBar from '../components/predictions/ProbabilityBar'
+import ChatPanel from '../components/chat/ChatPanel'
 
 export default function RaceCardPage() {
   const { raceId } = useParams()
@@ -238,6 +239,14 @@ export default function RaceCardPage() {
           </div>
         )
       })()}
+
+      {/* AI Chat */}
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold text-white mb-3">
+          Ask the AI Expert
+        </h2>
+        <ChatPanel raceId={parseInt(raceId)} className="h-full" />
+      </div>
 
     </div>
   )

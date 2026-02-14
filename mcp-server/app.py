@@ -129,6 +129,18 @@ def embed_races():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/embed/reset', methods=['POST'])
+def reset_and_embed():
+    """Reset vector store and re-embed all races."""
+    vector_store.reset()
+    from src.rag.embedder import RaceEmbedder
+    embedder = RaceEmbedder(vector_store)
+    try:
+        count = embedder.embed_all_races()
+        return jsonify({'status': 'success', 'races_embedded': count})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/mcp/tools', methods=['GET'])
 def list_tools():
     """List available MCP tools."""

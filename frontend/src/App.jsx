@@ -3,6 +3,7 @@ import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import RaceCardPage from './pages/RaceCardPage'
 import ResultsPage from './pages/ResultsPage'
+import ChatPage from './pages/ChatPage'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="races/:raceId" element={<RaceCardPage />} />
           <Route path="results" element={<ResultsPage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
