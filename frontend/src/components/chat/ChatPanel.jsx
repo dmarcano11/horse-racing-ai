@@ -7,29 +7,61 @@ function MessageBubble({ message }) {
   return (
     <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center
-                        justify-center text-sm flex-shrink-0 mt-1">
-          🏇
+        <div 
+          className="flex items-center justify-center text-sm flex-shrink-0 mt-1 rounded-full"
+          style={{
+            width: '32px',
+            height: '32px',
+            border: '2px solid var(--gold)',
+            background: 'var(--surface)'
+          }}
+        >
+          ♟
+          <div 
+            className="absolute rounded-full"
+            style={{
+              width: '8px',
+              height: '8px',
+              background: 'var(--green)',
+              bottom: '0',
+              right: '0',
+              border: '2px solid var(--obsidian)'
+            }}
+          />
         </div>
       )}
-      <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed
-                      ${isUser
-                        ? 'bg-blue-600 text-white rounded-tr-sm'
-                        : 'bg-slate-700 text-slate-100 rounded-tl-sm'}`}>
-        {/* Render markdown-style bold */}
+      <div 
+        className="max-w-[80%] px-4 py-3 font-body text-sm"
+        style={{
+          background: isUser ? 'rgba(196,158,66,0.10)' : 'var(--card)',
+          border: `1px solid ${isUser ? 'var(--border-hi)' : 'var(--border)'}`,
+          borderRadius: isUser ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
+          color: 'rgba(237,228,204,0.88)',
+          lineHeight: 1.65
+        }}
+      >
         {message.content.split('\n').map((line, i) => (
           <p key={i} className={line.startsWith('#')
-            ? 'font-bold text-white mb-1'
+            ? 'font-bold mb-1'
             : line.startsWith('**') || line.startsWith('-')
-              ? 'text-slate-200 mb-0.5'
-              : 'mb-0.5'}>
+              ? 'mb-0.5'
+              : 'mb-0.5'}
+             style={{ color: 'rgba(237,228,204,0.88)' }}
+          >
             {line.replace(/#{1,3}\s/, '').replace(/\*\*/g, '')}
           </p>
         ))}
       </div>
       {isUser && (
-        <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center
-                        justify-center text-sm flex-shrink-0 mt-1">
+        <div 
+          className="flex items-center justify-center text-sm flex-shrink-0 mt-1 rounded-full"
+          style={{
+            width: '32px',
+            height: '32px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)'
+          }}
+        >
           👤
         </div>
       )}
@@ -85,7 +117,7 @@ export default function ChatPanel({ raceId = null, className = '' }) {
         role: 'assistant',
         content: responseText
       }])
-    } catch (err) {
+    } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: "Sorry, I'm having trouble connecting right now. Make sure the MCP server is running on port 5002."
@@ -96,39 +128,106 @@ export default function ChatPanel({ raceId = null, className = '' }) {
   }
 
   return (
-    <div className={`flex flex-col bg-slate-800 rounded-xl border
-                    border-slate-700 overflow-hidden ${className}`}>
+    <div 
+      className={`flex flex-col overflow-hidden ${className}`}
+      style={{
+        background: 'var(--obsidian)',
+        border: '1px solid rgba(196,158,66,0.12)',
+        borderRadius: '16px',
+      }}
+    >
+      {/* Top Border Glow */}
+      <div style={{
+        height: '2px',
+        background: 'linear-gradient(90deg, transparent, var(--gold), transparent)',
+        opacity: 0.3
+      }} />
 
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-700 flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        <span className="text-sm font-medium text-white">AI Racing Expert</span>
-        <span className="text-xs text-slate-400 ml-auto">
-          Powered by Claude + RAG
-        </span>
+      <div 
+        className="px-4 py-3 flex items-center gap-3"
+        style={{ borderBottom: '1px solid var(--border)' }}
+      >
+        {/* Avatar with online dot */}
+        <div className="relative">
+          <div 
+            className="flex items-center justify-center rounded-full"
+            style={{
+              width: '36px',
+              height: '36px',
+              border: '2px solid var(--gold)',
+              background: 'var(--surface)'
+            }}
+          >
+            ♟
+          </div>
+          <div 
+            className="absolute rounded-full"
+            style={{
+              width: '10px',
+              height: '10px',
+              background: 'var(--green)',
+              bottom: '0',
+              right: '0',
+              border: '2px solid var(--obsidian)'
+            }}
+          />
+        </div>
+        
+        <div className="flex-1">
+          <div className="font-display text-base" style={{ color: 'var(--cream)' }}>
+            AI Racing Expert
+          </div>
+          <div className="font-mono text-[8px]" style={{ color: 'var(--muted)' }}>
+            Online · {messages.length - 1} messages
+          </div>
+        </div>
+
+        <div 
+          className="font-mono text-[8px] rounded-full px-3 py-1"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid var(--border)',
+            color: 'var(--muted)'
+          }}
+        >
+          Claude + RAG · ML Active
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[300px]
-                      max-h-[500px]">
+      <div 
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+        style={{ minHeight: '300px', maxHeight: '500px' }}
+      >
         {messages.map((msg, i) => (
           <MessageBubble key={i} message={msg} />
         ))}
 
         {loading && (
           <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center
-                            justify-center text-sm flex-shrink-0">
-              🏇
+            <div 
+              className="flex items-center justify-center text-sm flex-shrink-0 rounded-full"
+              style={{
+                width: '32px',
+                height: '32px',
+                border: '2px solid var(--gold)',
+                background: 'var(--surface)'
+              }}
+            >
+              ♟
             </div>
-            <div className="bg-slate-700 rounded-2xl rounded-tl-sm px-4 py-3">
+            <div 
+              className="rounded-2xl px-4 py-3"
+              style={{
+                background: 'var(--card)',
+                borderRadius: '4px 12px 12px 12px'
+              }}
+            >
               <div className="flex gap-1 items-center h-5">
-                <div className="w-2 h-2 rounded-full bg-slate-400
-                                animate-bounce [animation-delay:0ms]" />
-                <div className="w-2 h-2 rounded-full bg-slate-400
-                                animate-bounce [animation-delay:150ms]" />
-                <div className="w-2 h-2 rounded-full bg-slate-400
-                                animate-bounce [animation-delay:300ms]" />
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--slate)', animationDelay: '0ms' }} />
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--slate)', animationDelay: '150ms' }} />
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--slate)', animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -144,9 +243,22 @@ export default function ChatPanel({ raceId = null, className = '' }) {
             <button
               key={q}
               onClick={() => sendMessage(q)}
-              className="text-xs px-3 py-1.5 rounded-full bg-slate-700
-                         hover:bg-slate-600 text-slate-300 hover:text-white
-                         transition-colors border border-slate-600"
+              className="font-mono text-[9px] px-3 py-1.5 rounded-full transition-all"
+              style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                color: 'var(--slate)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-hi)'
+                e.currentTarget.style.color = 'var(--gold)'
+                e.currentTarget.style.background = 'var(--gold-glow)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)'
+                e.currentTarget.style.color = 'var(--slate)'
+                e.currentTarget.style.background = 'var(--card)'
+              }}
             >
               {q}
             </button>
@@ -155,7 +267,13 @@ export default function ChatPanel({ raceId = null, className = '' }) {
       )}
 
       {/* Input */}
-      <div className="p-3 border-t border-slate-700 flex gap-2">
+      <div 
+        className="p-4 flex gap-2"
+        style={{ 
+          background: 'var(--surface)',
+          borderTop: '1px solid var(--border)'
+        }}
+      >
         <input
           type="text"
           value={input}
@@ -165,17 +283,31 @@ export default function ChatPanel({ raceId = null, className = '' }) {
             ? "Ask about this race..."
             : "Ask about races, predictions, strategy..."}
           disabled={loading}
-          className="flex-1 bg-slate-700 border border-slate-600 rounded-lg
-                     px-3 py-2 text-sm text-white placeholder-slate-400
-                     focus:outline-none focus:border-blue-500
-                     disabled:opacity-50"
+          className="flex-1 px-3 py-2 text-sm rounded-lg transition-all font-body"
+          style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            color: 'var(--cream)',
+            outline: 'none'
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-hi)'
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border)'
+          }}
         />
         <button
           onClick={() => sendMessage()}
           disabled={loading || !input.trim()}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40
-                     disabled:cursor-not-allowed rounded-lg text-white text-sm
-                     font-medium transition-colors"
+          className="px-4 py-2 rounded-lg text-sm font-medium font-mono transition-colors"
+          style={{
+            background: loading || !input.trim() ? 'var(--muted)' : 'linear-gradient(135deg, var(--gold), #A8852E)',
+            color: 'var(--obsidian)',
+            border: 'none',
+            cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+            opacity: loading || !input.trim() ? 0.4 : 1
+          }}
         >
           Send
         </button>

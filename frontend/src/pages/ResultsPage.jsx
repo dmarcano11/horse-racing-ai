@@ -4,11 +4,11 @@ import { format, subDays, addDays } from 'date-fns'
 import { useRaces } from '../hooks/useRaces'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import ErrorMessage from '../components/ui/ErrorMessage'
-import Badge from '../components/ui/Badge'
+import TrackTabs from '../components/ui/TrackTabs'
 
 export default function ResultsPage() {
 	const [selectedDate, setSelectedDate] = useState(new Date('2026-02-07'))
-	const [selectedTrack, setSelectedTrack] = useState();
+	const [selectedTrack, setSelectedTrack] = useState()
 	const { races, loading, error } = useRaces(selectedDate)
 	const navigate = useNavigate()
 
@@ -22,18 +22,25 @@ export default function ResultsPage() {
 		return acc
 	}, {})
 
-	const tracks = Object.keys(racesByTrack).sort()
-	const activeTrack = selectedTrack || tracks[0]
-	const activeRaces = racesByTrack[activeTrack] || []
+	const tracks = Object.keys(racesByTrack).sort().map(name => ({
+		id: name,
+		name,
+		count: racesByTrack[name].length
+	}))
+	
+	const activeTrack = selectedTrack || tracks[0]?.id
+	const activeRaces = activeTrack ? racesByTrack[activeTrack] || [] : []
 
 	return (
 		<div className="space-y-6">
 
 			{/* Header */}
-			<div className="flex items-center justify-between">
+			<div className="flex items-center justify-between flex-wrap gap-4">
 				<div>
-					<h1 className="text-2xl font-bold text-white">Results</h1>
-					<p className="text-slate-400 text-sm mt-1">
+					<h1 className="font-display text-3xl mb-2" style={{ color: 'var(--cream)' }}>
+						Results
+					</h1>
+					<p className="font-mono text-[10px]" style={{ color: 'var(--muted)' }}>
 						{completedRaces.length} completed races
 					</p>
 				</div>
@@ -42,8 +49,20 @@ export default function ResultsPage() {
 				<div className="flex items-center gap-2">
 					<button
 						onClick={() => setSelectedDate(d => subDays(d, 1))}
-						className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700
-                       text-slate-400 hover:text-white transition-colors"
+						className="p-2 rounded-lg transition-colors font-mono"
+						style={{
+							background: 'var(--card)',
+							border: '1px solid var(--border)',
+							color: 'var(--slate)'
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.background = 'var(--card-hi)'
+							e.currentTarget.style.color = 'var(--cream)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.background = 'var(--card)'
+							e.currentTarget.style.color = 'var(--slate)'
+						}}
 					>
 						←
 					</button>
@@ -51,13 +70,30 @@ export default function ResultsPage() {
 						type="date"
 						value={format(selectedDate, 'yyyy-MM-dd')}
 						onChange={e => setSelectedDate(new Date(e.target.value + 'T12:00:00'))}
-						className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2
-                       text-white text-sm focus:outline-none focus:border-blue-500"
+						className="rounded-lg px-3 py-2 text-sm font-mono"
+						style={{
+							background: 'var(--card)',
+							border: '1px solid var(--border)',
+							color: 'var(--cream)',
+							outline: 'none'
+						}}
 					/>
 					<button
 						onClick={() => setSelectedDate(d => addDays(d, 1))}
-						className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700
-                       text-slate-400 hover:text-white transition-colors"
+						className="p-2 rounded-lg transition-colors font-mono"
+						style={{
+							background: 'var(--card)',
+							border: '1px solid var(--border)',
+							color: 'var(--slate)'
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.background = 'var(--card-hi)'
+							e.currentTarget.style.color = 'var(--cream)'
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.background = 'var(--card)'
+							e.currentTarget.style.color = 'var(--slate)'
+						}}
 					>
 						→
 					</button>
@@ -68,64 +104,78 @@ export default function ResultsPage() {
 			{error && <ErrorMessage message={error} />}
 
 			{!loading && completedRaces.length === 0 && (
-				<div className="text-center py-20 text-slate-400">
+				<div className="text-center py-20 font-body" style={{ color: 'var(--slate)' }}>
 					No completed races found for {format(selectedDate, 'MMMM d, yyyy')}
 				</div>
 			)}
 
 			{/* Results Grid */}
 			{!loading && tracks.length > 0 && (
-				<div className="space-y-4">
+				<div className="space-y-6">
 					{/* Track Tabs */}
-					<div className="flex flex-wrap gap-2">
-						{tracks.map(track => (
-							<button
-								key={track}
-								onClick={() => setSelectedTrack(track)}
-								className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${track === activeTrack
-										? 'bg-blue-600 text-white'
-										: 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-									}`}
-							>
-								{track}
-								<span className="ml-2 text-xs opacity-70">
-									{racesByTrack[track].length}
-								</span>
-							</button>
-						))}
-					</div>
+					<TrackTabs 
+						tracks={tracks} 
+						activeTrack={activeTrack} 
+						onChange={setSelectedTrack} 
+					/>
 
-					{/* Results Grid - filtered by track */}
+					{/* Results Grid */}
 					<div className="grid grid-cols-1 gap-4">
 						{activeRaces.map(race => (
 							<div
 								key={race.id}
 								onClick={() => navigate(`/races/${race.id}`)}
-								className="bg-slate-800 rounded-xl border border-slate-700 p-5
-                     hover:border-slate-600 hover:bg-slate-700/50
-                     transition-all cursor-pointer"
+								className="rounded-xl p-5 cursor-pointer transition-all"
+								style={{
+									background: 'var(--card)',
+									border: '1px solid var(--border)'
+								}}
+								onMouseEnter={(e) => {
+									e.currentTarget.style.borderColor = 'var(--border-hi)'
+									e.currentTarget.style.background = 'var(--card-hi)'
+									e.currentTarget.style.transform = 'translateY(-2px)'
+								}}
+								onMouseLeave={(e) => {
+									e.currentTarget.style.borderColor = 'var(--border)'
+									e.currentTarget.style.background = 'var(--card)'
+									e.currentTarget.style.transform = 'translateY(0)'
+								}}
 							>
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
-										<span className="w-8 h-8 rounded-full bg-slate-700 flex items-center
-                               justify-center text-sm font-bold text-white">
+										<span 
+											className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-sm font-bold"
+											style={{
+												background: 'var(--surface)',
+												border: '1px solid var(--border)',
+												color: 'var(--cream)'
+											}}
+										>
 											{race.raceNumber}
 										</span>
 										<div>
-											<div className="text-white font-semibold">
+											<div className="font-body font-semibold" style={{ color: 'var(--cream)' }}>
 												{race.raceName && race.raceName !== `Race ${race.raceNumber}`
 													? race.raceName
 													: `Race ${race.raceNumber}`}
 											</div>
-											<div className="text-slate-400 text-sm">
+											<div className="font-mono text-sm" style={{ color: 'var(--slate)' }}>
 												{race.distanceValue}{race.distanceUnit} · {race.surface}
 												{race.purse && ` · $${race.purse.toLocaleString()}`}
 											</div>
 										</div>
 									</div>
 									<div className="flex items-center gap-3">
-										<Badge variant="green">Final</Badge>
-										<span className="text-blue-400 text-sm">View Details →</span>
+										<span className="font-mono text-[8px] px-3 py-1 rounded-full" style={{
+											background: 'var(--green-dim)',
+											color: 'var(--green)',
+											border: '1px solid rgba(60,184,122,0.25)'
+										}}>
+											Final
+										</span>
+										<span className="font-mono text-sm" style={{ color: 'var(--gold)' }}>
+											View Details →
+										</span>
 									</div>
 								</div>
 							</div>

@@ -1,1 +1,54 @@
 @import "tailwindcss";
+
+:root {
+  /* Backgrounds */
+  --obsidian: #080B10;
+  --deep: #0D1117;
+  --surface: #121820;
+  --card: #171F2A;
+  --card-hi: #1D2535;
+
+  /* Gold accent system */
+  --border: rgba(196, 158, 66, 0.14);
+  --border-hi: rgba(196, 158, 66, 0.40);
+  --gold: #C49E42;
+  --gold-light: #E3C068;
+  --gold-dim: rgba(196, 158, 66, 0.55);
+  --gold-glow: rgba(196, 158, 66, 0.12);
+
+  /* Text */
+  --cream: #EDE4CC;
+  --slate: #8A98AE;
+  --muted: #4D5B70;
+
+  /* Status */
+  --live: #E04B35;
+  --live-dim: rgba(224, 75, 53, 0.22);
+  --green: #3CB87A;
+  --green-dim: rgba(60, 184, 122, 0.18);
+  --blue: #4A8FE8;
+  --blue-dim: rgba(74, 143, 232, 0.18);
+}
+
+body {
+  background-color: var(--obsidian);
+  color: var(--cream);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+/* Utility animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.45s ease forwards; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse { animation: blink 1.4s ease-in-out infinite; }
