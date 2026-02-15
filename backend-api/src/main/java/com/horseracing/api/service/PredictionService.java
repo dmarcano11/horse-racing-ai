@@ -45,7 +45,7 @@ public class PredictionService {
                     mlServiceUrl + "/predict/race/" + raceId,
                     Map.class
             );
-            if (response.getStatusCode() == HttpStatus.OK) {
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 log.info("✓ Full feature prediction successful for race {}", raceId);
                 return response.getBody();
             }
@@ -116,6 +116,12 @@ public class PredictionService {
                     request,
                     Map.class
             );
+
+            // Add null check
+            if (response.getBody() == null) {
+                log.error("ML service returned null body for race {}", raceId);
+                throw new RuntimeException("ML service returned empty response");
+            }
 
             Map<String, Object> result = new HashMap<>(response.getBody());
             result.put("note", "Basic prediction using morning line odds only");
