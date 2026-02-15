@@ -23,26 +23,42 @@ class VectorStore:
         try:
             CHROMA_PATH.mkdir(parents=True, exist_ok=True)
 
-            self.client = chromadb.PersistentClient(
-                path=str(CHROMA_PATH),
-                settings=Settings(anonymized_telemetry=False)
-            )
-
-            self.collection = self.client.get_or_create_collection(
-                name="horse_races",
-                metadata={"hnsw:space": "cosine"}
-            )
+            # Start fresh if existing DB is corrupt/incompatible
+            try:
+                self.client = chromadb.PersistentClient(
+                    path=str(CHROMA_PATH),
+                    settings=Settings(anonymized_telemetry=False)
+                )
+                self.collection = self.client.get_or_create_collection(
+                    name="horse_races",
+                    metadata={"hnsw:space": "cosine"}
+                )
+            except Exception:
+                # Wipe and recreate if DB is incompatible
+                logger.warning("ChromaDB incompatible - resetting...")
+                import shutil
+                shutil.rmtree(str(CHROMA_PATH))
+                CHROMA_PATH.mkdir(parents=True, exist_ok=True)
+                self.client = chromadb.PersistentClient(
+                    path=str(CHROMA_PATH),
+                    settings=Settings(anonymized_telemetry=False)
+                )
+                self.collection = self.client.get_or_create_collection(
+                    name="horse_races",
+                    metadata={"hnsw:space": "cosine"}
+                )
 
             count = self.collection.count()
             logger.info(f"✓ Vector store ready - {count} races indexed")
 
         except Exception as e:
             logger.error(f"Vector store init failed: {e}")
-            raise
+            # Don't raise - allow app to start, embedding can happen later
+            self.client = None
+            self.collection = None
 
     def is_ready(self) -> bool:
-        """Check if vector store is ready."""
-        return self.collection is not None
+        return self.client is not None and self.collection is not None
 
     def add_races(self, documents: list, embeddings: list,
                   metadatas: list, ids: list):
