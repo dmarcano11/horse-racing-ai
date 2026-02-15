@@ -2,6 +2,7 @@
 import joblib
 import pandas as pd
 import numpy as np
+import sys
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sqlalchemy import create_engine, text
@@ -10,13 +11,13 @@ import os
 
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = Path("../data-ingestion/models/tuned/random_forest_tuned.pkl")
-FEATURES_PATH = Path("../data-ingestion/data/processed/features_complete.csv")
-
-DB_URL = os.getenv(
-    'DATABASE_URL',
-    'postgresql://racing_user:racing_dev_password@localhost:5433/racing_db'
+_DATA_INGESTION = (
+    Path("/data-ingestion") if Path("/data-ingestion").exists()
+    else Path(__file__).parent.parent / "data-ingestion"
 )
+
+MODEL_PATH = _DATA_INGESTION / "models/tuned/random_forest_tuned.pkl"
+FEATURES_PATH = _DATA_INGESTION / "data/processed/features_complete.csv"
 
 class HorseRacingPredictor:
     """Generates win probability predictions using real features."""
@@ -78,7 +79,7 @@ class HorseRacingPredictor:
         Uses the same feature engineering as training.
         """
         import sys
-        sys.path.insert(0, str(Path(__file__).parent.parent / 'data-ingestion'))
+        sys.path.insert(0, str(_DATA_INGESTION))
 
         from src.db.session import get_db_context
         from src.features.feature_builder import FeatureBuilder

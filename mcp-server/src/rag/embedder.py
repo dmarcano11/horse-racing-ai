@@ -8,8 +8,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Fix: explicitly add data-ingestion and remove src cache conflict
-DATA_INGESTION_PATH = str(
-    Path(__file__).parent.parent.parent.parent / 'data-ingestion'
+DATA_INGESTION_PATH = (
+    Path("/data-ingestion") if Path("/data-ingestion").exists()
+    else Path(__file__).parent.parent.parent.parent / "data-ingestion"
 )
 
 # Insert at 0 so it takes priority over mcp-server/src
