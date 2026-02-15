@@ -6,15 +6,17 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from sqlalchemy import create_engine, text
 import logging
-from datetime import date
+import os
 
 logger = logging.getLogger(__name__)
 
 MODEL_PATH = Path("../data-ingestion/models/tuned/random_forest_tuned.pkl")
 FEATURES_PATH = Path("../data-ingestion/data/processed/features_complete.csv")
 
-DB_URL = "postgresql://racing_user:racing_dev_password@localhost:5433/racing_db"
-
+DB_URL = os.getenv(
+    'DATABASE_URL',
+    'postgresql://racing_user:racing_dev_password@localhost:5433/racing_db'
+)
 
 class HorseRacingPredictor:
     """Generates win probability predictions using real features."""

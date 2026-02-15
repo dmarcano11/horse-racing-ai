@@ -4,6 +4,7 @@ import requests
 from pathlib import Path
 from datetime import date
 import logging
+import os
 
 DATA_INGESTION_PATH = str(
     Path(__file__).parent.parent.parent.parent / 'data-ingestion'
@@ -15,8 +16,7 @@ if 'src' in sys.modules:
     del sys.modules['src']
 
 logger = logging.getLogger(__name__)
-SPRING_BOOT_URL = "http://localhost:8080"
-
+SPRING_BOOT_URL = os.getenv('BACKEND_API_URL', 'http://localhost:8080')
 
 class MCPServer:
     """MCP tools for horse racing data access."""

@@ -57,18 +57,28 @@ logs/
 *.log
 
 # ML Models
-*.pkl
 *.pth
 *.h5
-models/*.pth
-!models/.gitkeep
+# Allow our trained models (small enough for git)
+!data-ingestion/models/**/*.pkl
+!data-ingestion/models/**/*.json
 
-# Data
+# Models - only keep tuned production models
+models/baseline_*.pkl
+models/random_forest.pkl
+models/xgboost.pkl
+models/ensemble/
+models/tuned/logistic_regression_tuned.pkl
+
+# Data - keep raw and processed out of git
 data/raw/
+data/backtesting/
 data/processed/
-*.csv
-*.json
-!**/sample*.json
+# Exceptions - only what production needs
+!data-ingestion/data/processed/features_complete.csv
+
+# ChromaDB local data
+mcp-server/data/
 
 # Coverage
 coverage/
