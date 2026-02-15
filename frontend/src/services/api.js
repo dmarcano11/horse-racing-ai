@@ -13,6 +13,7 @@ export const getRacesByDate = (date) => api.get("/races", { params: { date } });
 export const getRaceCard = (raceId, predictions = true) =>
   api.get(`/races/${raceId}/card`, { params: { predictions } });
 
+// TODO: This endpoint is currently unused, but may be useful in the future for a "results" page or similar
 export const getCompletedRaces = (date) =>
   api.get("/races/completed", { params: { date } });
 
