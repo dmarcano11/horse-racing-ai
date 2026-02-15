@@ -143,6 +143,25 @@ def predict_runner(runner_id):
         'message': 'Use /predict/race for full race predictions'
     })
 
+@app.route('/debug', methods=['GET'])
+def debug():
+    """Debug endpoint to check paths."""
+    from pathlib import Path
+    import os
+
+    data_ingestion_exists = Path('/data-ingestion').exists()
+    model_exists = Path('/data-ingestion/models/tuned/random_forest_tuned.pkl').exists()
+    src_exists = Path('/data-ingestion/src').exists()
+
+    return jsonify({
+        'data_ingestion_dir': data_ingestion_exists,
+        'model_file': model_exists,
+        'src_dir': src_exists,
+        'data_ingestion_contents': os.listdir('/data-ingestion') if data_ingestion_exists else [],
+        'cwd': os.getcwd(),
+        'app_contents': os.listdir('/app')
+    })
+
 
 if __name__ == '__main__':
     logger.info("Starting Horse Racing ML Service...")
