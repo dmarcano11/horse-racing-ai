@@ -176,7 +176,7 @@ export default function HorseCanvas() {
 
       {/* BEAT A: 0–22% — Hero brand reveal */}
       <BeatOverlay progress={smoothProgress} start={0} end={0.22} align="center" startVisible>
-        <div className="font-mono text-[10px] tracking-[0.4em] uppercase mb-5 flex items-center gap-3" style={{ color: 'rgba(196,158,66,0.6)' }}>
+        <div className="font-mono text-[14px] tracking-[0.4em] uppercase mb-5 flex items-center gap-3" style={{ color: 'rgba(196,158,66,0.6)' }}>
           <span style={{display:'inline-block',width:30,height:1,background:'linear-gradient(90deg,transparent,rgba(196,158,66,0.5))'}}/>
           AI-Powered Horse Racing Intelligence
           <span style={{display:'inline-block',width:30,height:1,background:'linear-gradient(90deg,rgba(196,158,66,0.5),transparent)'}}/>
@@ -184,7 +184,7 @@ export default function HorseCanvas() {
         <h1 className="font-display font-bold leading-tight mb-4" style={{ fontSize:'clamp(52px, 8vw, 96px)', color:'var(--cream)' }}>
           Across the<br/><em style={{fontStyle:'italic', color:'var(--gold)'}}>Board</em>
         </h1>
-        <p className="font-mono text-[11px] tracking-[0.2em]" style={{ color:'var(--slate)' }}>
+        <p className="font-mono text-[13px] tracking-[0.2em]" style={{ color:'var(--slate)' }}>
           Win · Place · Show — Research every angle
         </p>
       </BeatOverlay>
@@ -215,18 +215,18 @@ export default function HorseCanvas() {
         <h2 className="font-display font-bold italic mb-3" style={{ fontSize:'clamp(44px, 6vw, 72px)', color:'var(--gold)', lineHeight:1 }}>
           Start Your Research
         </h2>
-        <p className="font-mono text-[11px] tracking-[0.2em] mb-9" style={{ color:'var(--muted)', letterSpacing:'0.2em' }}>
+        <p className="font-mono text-[16px] tracking-[0.2em] mb-9" style={{ color:'var(--muted)', letterSpacing:'0.2em' }}>
           No signup. No paywall. Just data.
         </p>
         <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
-          <a href="/chat" className="font-mono text-[11px] tracking-[0.2em] font-semibold uppercase rounded px-8 py-3.5 transition-all" style={{
+          <a href="/chat" className="font-mono text-[13px] tracking-[0.2em] font-semibold uppercase rounded px-8 py-3.5 transition-all" style={{
             background:'linear-gradient(135deg, var(--gold), #A8852E)',
             color:'var(--obsidian)',
             textDecoration:'none'
           }}>
             Explore the AI Expert →
           </a>
-          <a href="/races" className="font-mono text-[11px] tracking-[0.2em] uppercase rounded px-7 py-3.5 transition-all" style={{
+          <a href="/races" className="font-mono text-[13px] tracking-[0.2em] uppercase rounded px-7 py-3.5 transition-all" style={{
             background:'none',
             border:'1px solid var(--border-hi)',
             color:'var(--gold)',

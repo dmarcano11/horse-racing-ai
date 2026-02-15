@@ -21,22 +21,22 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-full">
 
           {/* Logo/Brand */}
-          <div className="flex items-center gap-2">
+          <NavLink to="/" className="flex items-center gap-2 cursor-pointer">
             <div>
-              <div className="font-display text-lg font-bold" style={{ color: 'var(--gold)' }}>
+              <div className="font-display text-2xl font-bold" style={{ color: 'var(--gold)' }}>
                 Across the Board
               </div>
-              <div className="font-mono text-[9px] tracking-[0.3em] uppercase" style={{ color: 'var(--muted)' }}>
+              <div className="font-mono text-[12px] tracking-[0.3em] uppercase" style={{ color: 'var(--muted)' }}>
                 AI · Research · Predictions
               </div>
             </div>
-          </div>
+          </NavLink>
 
           {/* Nav Links - Desktop */}
           <div className="hidden md:flex items-center gap-1">
             <NavLink
               to="/chat"
-              className="font-mono text-[10px] tracking-[0.15em] uppercase px-5 py-2 rounded transition-all"
+              className="font-mono text-[15px] tracking-[0.15em] uppercase px-5 py-2 rounded transition-all"
               style={({ isActive }) => ({
                 color: isActive ? 'var(--gold)' : 'var(--slate)',
                 background: isActive ? 'rgba(196,158,66,0.08)' : 'transparent',
@@ -47,7 +47,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/races"
-              className="font-mono text-[10px] tracking-[0.15em] uppercase px-5 py-2 rounded transition-all"
+              className="font-mono text-[15px] tracking-[0.15em] uppercase px-5 py-2 rounded transition-all"
               style={({ isActive }) => ({
                 color: isActive ? 'var(--gold)' : 'var(--slate)',
                 background: isActive ? 'rgba(196,158,66,0.08)' : 'transparent',
@@ -58,7 +58,7 @@ export default function Navbar() {
             </NavLink>
             <NavLink
               to="/results"
-              className="font-mono text-[10px] tracking-[0.15em] uppercase px-5 py-2 rounded transition-all"
+              className="font-mono text-[15px] tracking-[0.15em] uppercase px-5 py-2 rounded transition-all"
               style={({ isActive }) => ({
                 color: isActive ? 'var(--gold)' : 'var(--slate)',
                 background: isActive ? 'rgba(196,158,66,0.08)' : 'transparent',
@@ -81,7 +81,7 @@ export default function Navbar() {
             />
             
             {/* Current Date */}
-            <div className="font-mono text-[10px]" style={{ color: 'var(--muted)' }}>
+            <div className="font-mono text-[15px]" style={{ color: 'var(--muted)' }}>
               {format(new Date(), 'EEE, MMM d yyyy')}
             </div>
           </div>
