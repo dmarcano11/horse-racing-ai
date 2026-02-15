@@ -3,8 +3,8 @@ import GoldRule from '../components/ui/GoldRule'
 
 export default function ChatPage() {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--deep)', paddingTop: '80px' }}>
-      <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="min-h-screen" style={{ background: 'var(--deep)', paddingTop: '20px' }}>
+      <div className="max-w-4xl mx-auto px-4">
         <div className="font-mono text-[9px] tracking-[0.35em] uppercase mb-3" style={{ color: 'rgba(196,158,66,0.6)' }}>
           Powered by Claude + RAG
         </div>

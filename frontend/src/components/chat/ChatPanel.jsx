@@ -90,7 +90,13 @@ export default function ChatPanel({ raceId = null, className = '' }) {
   const bottomRef = useRef(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    // Only scroll within the chat container, not the entire page
+    if (bottomRef.current) {
+      const container = bottomRef.current.parentElement
+      if (container) {
+        container.scrollTop = container.scrollHeight
+      }
+    }
   }, [messages])
 
   const sendMessage = async (text) => {

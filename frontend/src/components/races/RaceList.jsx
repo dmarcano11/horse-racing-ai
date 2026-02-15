@@ -14,13 +14,13 @@ export default function RaceList({ races }) {
           background: 'rgba(0,0,0,0.2)'
         }}
       >
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Race</div>
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Name</div>
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Distance</div>
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Surface</div>
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Purse</div>
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Status</div>
-        <div className="font-mono text-[8px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}></div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Race</div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Name</div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Distance</div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Surface</div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Purse</div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Status</div>
+        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}></div>
       </div>
 
       {/* Race Rows */}
@@ -84,16 +84,16 @@ export default function RaceList({ races }) {
             {/* Status */}
             <div>
               {race.hasResults ? (
-                <span className="font-mono text-[8px] text-atb-green">Final</span>
+                <span className="font-mono text-[12px] text-atb-green">Final</span>
               ) : race.hasFinished ? (
-                <span className="font-mono text-[8px] text-atb-blue">Official</span>
+                <span className="font-mono text-[12px] text-atb-blue">Official</span>
               ) : (
-                <span className="font-mono text-[8px]" style={{ color: 'var(--slate)' }}>Scheduled</span>
+                <span className="font-mono text-[12px]" style={{ color: 'var(--slate)' }}>Scheduled</span>
               )}
             </div>
 
             {/* View Link */}
-            <div className="text-right font-mono text-[9px]" style={{ color: 'var(--gold)' }}>
+            <div className="text-right font-mono text-[12px]" style={{ color: 'var(--gold)' }}>
               View →
             </div>
           </div>

@@ -7,7 +7,7 @@ export default function TrackTabs({ tracks, activeTrack, onChange }) {
           <button
             key={track.id}
             onClick={() => onChange(track.id)}
-            className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.08em] rounded-full px-4 py-2 transition-all duration-200 cursor-pointer"
+            className="inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.08em] rounded-full px-4 py-2 transition-all duration-200 cursor-pointer"
             style={{
               background: isActive ? 'rgba(196,158,66,0.10)' : 'var(--card)',
               border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
@@ -16,7 +16,7 @@ export default function TrackTabs({ tracks, activeTrack, onChange }) {
           >
             {track.name}
             <span 
-              className="rounded-full px-2 py-0.5 text-[9px]"
+              className="rounded-full px-2 py-0.5 text-[11px]"
               style={{
                 background: isActive ? 'rgba(196,158,66,0.2)' : 'rgba(255,255,255,0.07)',
                 color: isActive ? 'var(--gold-light)' : 'var(--muted)',

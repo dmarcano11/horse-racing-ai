@@ -37,7 +37,7 @@ export default function Dashboard() {
           <h1 className="font-display text-3xl mb-2" style={{ color: 'var(--cream)' }}>
             Race Dashboard
           </h1>
-          <p className="font-mono text-[10px]" style={{ color: 'var(--muted)' }}>
+          <p className="font-mono text-[12px]" style={{ color: 'var(--muted)' }}>
             {races.length} races across {tracks.length} tracks
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function Dashboard() {
                 <div className="font-display text-2xl font-bold mb-1" style={{ color: 'var(--cream)' }}>
                   {stat.value}
                 </div>
-                <div className="font-mono text-[9px]" style={{ color: 'var(--muted)' }}>
+                <div className="font-mono text-[13px]" style={{ color: 'var(--muted)' }}>
                   {stat.label}
                 </div>
               </div>
