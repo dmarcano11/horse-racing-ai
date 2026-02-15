@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { format } from 'date-fns'
 import { useState } from 'react'
 
-export default function Navbar() {
+export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
 

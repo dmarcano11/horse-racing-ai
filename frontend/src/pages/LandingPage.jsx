@@ -1,4 +1,4 @@
-import Navbar from '../components/layout/Navbar'
+import NavBar from '../components/layout/NavBar'
 import HorseCanvas from '../components/layout/HorseCanvas'
 import TrustSection from '../components/landing/TrustSection'
 import FeatureChatPreview from '../components/landing/FeatureChatPreview'
@@ -9,8 +9,8 @@ import FeatureResultsPreview from '../components/landing/FeatureResultsPreview'
 export default function LandingPage() {
   return (
     <div style={{ background: 'var(--obsidian)', position: 'relative', margin: 0, padding: 0 }}>
-      {/* Navbar with transparent styling for landing - overlays the canvas */}
-      <Navbar />
+      {/* NavBar with transparent styling for landing - overlays the canvas */}
+      <NavBar />
       
       {/* Horse Canvas Scroll Animation - starts at top with navbar overlaying */}
       <div style={{ position: 'relative', width: '100%', margin: 0, padding: 0, background: '#070707' }}>

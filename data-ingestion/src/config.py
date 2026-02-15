@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Racing API
-    racing_api_username: str
-    racing_api_password: str
+    racing_api_username: str = ""
+    racing_api_password: str = ""
     racing_api_base_url: str = "https://api.theracingapi.com/v1/north-america"
 
     # Database
