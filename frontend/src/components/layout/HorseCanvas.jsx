@@ -4,13 +4,13 @@ import { useScroll, useSpring, useTransform } from 'framer-motion'
 import { motion } from 'framer-motion'
 
 // Frame count and paths based on actual files in /public/sequence/
-const FRAME_COUNT = 24
+const FRAME_COUNT = 192
 const FRAMES_PATH = '/sequence/frame_'
 
-// Map of frame index to actual delay suffix (alternates between 0.041s and 0.042s)
+// Map of frame index to actual delay suffix
+// Pattern: every third frame starting from index 1 uses 0.041s, all others use 0.042s
 const getFrameDelay = (index) => {
-  // Frames 01, 04, 07, 10, 13, 16, 19, 22 use 0.041s, others use 0.042s
-  return [1, 4, 7, 10, 13, 16, 19, 22].includes(index) ? '_delay-0.041s.jpg' : '_delay-0.042s.jpg'
+  return index % 3 === 1 ? '_delay-0.041s.jpg' : '_delay-0.042s.jpg'
 }
 
 export default function HorseCanvas() {
@@ -34,7 +34,7 @@ export default function HorseCanvas() {
     
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image()
-      const paddedIndex = String(i).padStart(2, '0')
+      const paddedIndex = String(i).padStart(3, '0') // 3-digit padding for 192 frames
       const frameExt = getFrameDelay(i)
       img.src = `${FRAMES_PATH}${paddedIndex}${frameExt}`
       
@@ -64,6 +64,21 @@ export default function HorseCanvas() {
       console.log(`Loaded ${successfulLoads}/${FRAME_COUNT} frames successfully`)
       if (successfulLoads > 0) {
         setLoaded(true)
+        // Draw the first frame immediately
+        requestAnimationFrame(() => {
+          const canvas = canvasRef.current
+          if (!canvas) return
+          const ctx = canvas.getContext('2d')
+          const img = images[0]
+          if (img && img.complete && img.naturalWidth > 0) {
+            const { width: cw, height: ch } = canvas
+            const scale = Math.min(cw / img.naturalWidth, ch / img.naturalHeight)
+            const x = (cw - img.naturalWidth * scale) / 2
+            const y = (ch - img.naturalHeight * scale) / 2
+            ctx.clearRect(0, 0, cw, ch)
+            ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale)
+          }
+        })
       }
     })
   }, [])
@@ -96,19 +111,36 @@ export default function HorseCanvas() {
       if (!canvasRef.current) return
       canvasRef.current.width = window.innerWidth
       canvasRef.current.height = window.innerHeight
+      
+      // Redraw current frame after resize
+      if (loaded && imagesRef.current.length > 0) {
+        const ctx = canvasRef.current.getContext('2d')
+        const currentProgress = smoothProgress.get()
+        const frameIndex = Math.min(Math.round(currentProgress * (FRAME_COUNT - 1)), FRAME_COUNT - 1)
+        const img = imagesRef.current[frameIndex]
+        
+        if (img && img.complete && img.naturalWidth > 0) {
+          const { width: cw, height: ch } = canvasRef.current
+          const scale = Math.min(cw / img.naturalWidth, ch / img.naturalHeight)
+          const x = (cw - img.naturalWidth * scale) / 2
+          const y = (ch - img.naturalHeight * scale) / 2
+          ctx.clearRect(0, 0, cw, ch)
+          ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale)
+        }
+      }
     }
     resize()
     window.addEventListener('resize', resize)
     return () => window.removeEventListener('resize', resize)
-  }, [])
+  }, [loaded, smoothProgress])
 
   return (
-    <div ref={wrapperRef} style={{ height: '400vh', position: 'relative' }}>
+    <div ref={wrapperRef} style={{ height: '400vh', position: 'relative', width: '100%', margin: 0, padding: 0 }}>
       {/* Loading screen */}
       {!loaded && (
         <div style={{
           position: 'sticky', top: 0, height: '100vh', width: '100%',
-          background: 'var(--obsidian)',
+          background: '#070707',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', gap: 24,
         }}>
@@ -137,13 +169,13 @@ export default function HorseCanvas() {
       {loaded && (
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: '30vh',
-          background: 'linear-gradient(to bottom, transparent, var(--obsidian))',
+          background: 'linear-gradient(to bottom, transparent, #070707)',
           pointerEvents: 'none',
         }} />
       )}
 
       {/* BEAT A: 0–22% — Hero brand reveal */}
-      <BeatOverlay progress={smoothProgress} start={0} end={0.22} align="center">
+      <BeatOverlay progress={smoothProgress} start={0} end={0.22} align="center" startVisible>
         <div className="font-mono text-[10px] tracking-[0.4em] uppercase mb-5 flex items-center gap-3" style={{ color: 'rgba(196,158,66,0.6)' }}>
           <span style={{display:'inline-block',width:30,height:1,background:'linear-gradient(90deg,transparent,rgba(196,158,66,0.5))'}}/>
           AI-Powered Horse Racing Intelligence
@@ -158,17 +190,18 @@ export default function HorseCanvas() {
       </BeatOverlay>
 
       {/* BEAT B: 25–48% — Win Place Show */}
-      <BeatOverlay progress={smoothProgress} start={0.25} end={0.48} align="left">
+      {/* <BeatOverlay progress={smoothProgress} start={0.25} end={0.48} align="left">
         <h2 className="font-display font-bold mb-4" style={{ fontSize:'clamp(40px, 6vw, 72px)', color:'var(--gold)' }}>
           Win. Place. Show.
         </h2>
         <p className="font-body text-[15px] leading-relaxed" style={{ color:'var(--slate)', maxWidth:360 }}>
           Research all three outcomes before you wager. ML predictions for every US race, completely free.
         </p>
-      </BeatOverlay>
+      </BeatOverlay> */}
 
       {/* BEAT C: 52–72% — The Model */}
-      <BeatOverlay progress={smoothProgress} start={0.52} end={0.72} align="right">
+      {/* <BeatOverlay progress={smoothProgress} start={0.52} end={0.72} align="right"> */}
+      <BeatOverlay progress={smoothProgress} start={0.20} end={0.55} align="right">
         <h2 className="font-display font-bold mb-4" style={{ fontSize:'clamp(40px, 6vw, 72px)', color:'var(--cream)' }}>
           55 Features.<br/>One Model.
         </h2>
@@ -178,7 +211,7 @@ export default function HorseCanvas() {
       </BeatOverlay>
 
       {/* BEAT D: 76–98% — CTA */}
-      <BeatOverlay progress={smoothProgress} start={0.76} end={0.98} align="center">
+      <BeatOverlay progress={smoothProgress} start={0.76} end={0.98} align="center" stayVisible verticalAlign="bottom">
         <h2 className="font-display font-bold italic mb-3" style={{ fontSize:'clamp(44px, 6vw, 72px)', color:'var(--gold)', lineHeight:1 }}>
           Start Your Research
         </h2>
@@ -211,11 +244,23 @@ export default function HorseCanvas() {
 }
 
 // Helper: positions a beat overlay sticky on screen
-function BeatOverlay({ children, progress, start, end, align }) {
-  const opacity = useTransform(progress, [start, start+0.08, end-0.08, end], [0,1,1,0])
-  const y = useTransform(progress, [start, start+0.08, end-0.08, end], [20,0,0,-20])
+function BeatOverlay({ children, progress, start, end, align, startVisible = false, stayVisible = false, verticalAlign = 'center' }) {
+  // If startVisible is true, start at full opacity (1) instead of 0
+  const initialOpacity = startVisible ? 1 : 0
+  const initialY = startVisible ? 0 : 20
+  
+  // If stayVisible is true, maintain opacity at 1 instead of fading to 0 at the end
+  const finalOpacity = stayVisible ? 1 : 0
+  const finalY = stayVisible ? 0 : -20
+  
+  const opacity = useTransform(progress, [start, start+0.08, end-0.08, end], [initialOpacity,1,1,finalOpacity])
+  const y = useTransform(progress, [start, start+0.08, end-0.08, end], [initialY,0,0,finalY])
   const justifyMap = { left: 'flex-start', right: 'flex-end', center: 'center' }
   const textAlign = align === 'left' ? 'left' : align === 'right' ? 'right' : 'center'
+  
+  // Vertical alignment: 'top', 'center', 'bottom', or custom value like '70%'
+  const verticalAlignMap = { top: 'flex-start', center: 'center', bottom: 'flex-end' }
+  const alignItemsValue = verticalAlignMap[verticalAlign] || 'center'
   
   return (
     <motion.div style={{
@@ -223,7 +268,7 @@ function BeatOverlay({ children, progress, start, end, align }) {
       top: `${start * 100}%`,
       left: 0, right: 0,
       height: `${(end - start) * 400}vh`,
-      display: 'flex', alignItems: 'center',
+      display: 'flex', alignItems: alignItemsValue,
       justifyContent: justifyMap[align],
       padding: align === 'left' ? '0 0 0 8vw' : align === 'right' ? '0 8vw 0 0' : '0 20px',
       pointerEvents: 'none',
@@ -237,20 +282,20 @@ function BeatOverlay({ children, progress, start, end, align }) {
 }
 
 function ScrollHint({ progress }) {
-  const opacity = useTransform(progress, [0, 0.08], [1, 0])
+  // const opacity = useTransform(progress, [0, 0.08], [1, 0])
   
   return (
     <motion.div style={{
       position: 'absolute', bottom: '74%', left: '50%', transform: 'translateX(-50%)',
-      opacity, textAlign: 'center', zIndex: 10, pointerEvents: 'none',
+      textAlign: 'center', zIndex: 10, pointerEvents: 'none',
     }}>
-      <div className="font-mono text-[8px] tracking-[0.3em] uppercase mb-2" style={{ color:'var(--muted)', letterSpacing:'0.3em' }}>
+      <div className="font-mono text-[14px] tracking-[0.3em] uppercase mb-2" style={{ color:'var(--muted)', letterSpacing:'0.3em' }}>
         Scroll to explore
       </div>
       <motion.div
         animate={{ y: [0, 6, 0] }}
         transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ color:'rgba(196,158,66,0.5)', fontSize:18 }}
+        style={{ color:'rgba(196,158,66,0.5)', fontSize:40 }}
       >
         ↓
       </motion.div>
