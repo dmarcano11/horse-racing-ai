@@ -162,6 +162,25 @@ def debug():
         'app_contents': os.listdir('/app')
     })
 
+@app.route('/debug/load', methods=['POST'])
+def debug_load():
+    """Try to load model and report exact error."""
+    from pathlib import Path
+    import pickle
+    import traceback
+
+    try:
+        model_path = Path('/data-ingestion/models/tuned/random_forest_tuned.pkl')
+        with open(model_path, 'rb') as f:
+            model = pickle.load(f)
+        return jsonify({'status': 'success', 'model_type': str(type(model))})
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        })
+
 
 if __name__ == '__main__':
     logger.info("Starting Horse Racing ML Service...")
