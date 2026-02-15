@@ -2,6 +2,7 @@ package com.horseracing.api.service;
 
 import com.horseracing.api.entity.Runner;
 import com.horseracing.api.repository.RunnerRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
@@ -14,7 +15,9 @@ public class PredictionService {
 
     private final RestTemplate restTemplate;
     private final RunnerRepository runnerRepository;
-    private static final String ML_SERVICE_URL = "http://localhost:5001";
+
+    @Value("${ML_SERVICE_URL:http://localhost:5001}")
+    private String mlServiceUrl;
 
     public PredictionService(RunnerRepository runnerRepository) {
         this.restTemplate = new RestTemplate();
@@ -24,7 +27,7 @@ public class PredictionService {
     public boolean isHealthy() {
         try {
             ResponseEntity<Map> response = restTemplate.getForEntity(
-                    ML_SERVICE_URL + "/health",
+                    mlServiceUrl + "/health",
                     Map.class
             );
             return response.getStatusCode() == HttpStatus.OK;
@@ -39,7 +42,7 @@ public class PredictionService {
         try {
             log.info("Attempting full feature prediction for race {}", raceId);
             ResponseEntity<Map> response = restTemplate.getForEntity(
-                    ML_SERVICE_URL + "/predict/race/" + raceId,
+                    mlServiceUrl + "/predict/race/" + raceId,
                     Map.class
             );
             if (response.getStatusCode() == HttpStatus.OK) {
@@ -109,7 +112,7 @@ public class PredictionService {
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    ML_SERVICE_URL + "/predict/race",
+                    mlServiceUrl + "/predict/race",
                     request,
                     Map.class
             );
