@@ -1,4 +1,4 @@
-"""Flask ML microservice for horse racing predictions."""
+"""Flask ML microservice for horse racing predictions"""
 import logging
 import sys
 from pathlib import Path
