@@ -16,8 +16,17 @@ _DATA_INGESTION = (
     else Path(__file__).parent.parent / "data-ingestion"
 )
 
-MODEL_PATH = _DATA_INGESTION / "models/tuned/random_forest_tuned.pkl"
+# Prefer tuned model; fall back to non-tuned if missing (e.g. before running hyperparameter_tuning)
+_MODEL_TUNED = _DATA_INGESTION / "models/tuned/random_forest_tuned.pkl"
+_MODEL_FALLBACK = _DATA_INGESTION / "models/random_forest.pkl"
+MODEL_PATH = _MODEL_TUNED if _MODEL_TUNED.exists() else _MODEL_FALLBACK
 FEATURES_PATH = _DATA_INGESTION / "data/processed/features_complete.csv"
+
+# Database URL for feature pipeline (default matches docker-compose postgres)
+DB_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://racing_user:racing_dev_password@localhost:5433/racing_db",
+)
 
 class HorseRacingPredictor:
     """Generates win probability predictions using real features."""
@@ -57,17 +66,19 @@ class HorseRacingPredictor:
             train_df = df_sorted.iloc[:split_idx]
             self.scaler.fit(train_df[self.feature_columns])
 
-            # Connect to database
-            logger.info("Connecting to database...")
-            self.engine = create_engine(DB_URL)
-
-            # Test connection
-            with self.engine.connect() as conn:
-                conn.execute(text("SELECT 1"))
-            logger.info("✓ Database connected")
+            # Connect to database (optional: needed for GET /predict/race/<id> only)
+            try:
+                logger.info("Connecting to database...")
+                self.engine = create_engine(DB_URL)
+                with self.engine.connect() as conn:
+                    conn.execute(text("SELECT 1"))
+                logger.info("✓ Database connected")
+            except Exception as db_err:
+                logger.warning(f"Database not available: {db_err}. POST /predict/race will work; GET /predict/race/<id> will not.")
+                self.engine = None
 
             self.is_loaded = True
-            logger.info(f"✓ Model loaded with {len(self.feature_columns)} features")
+            logger.info(f"✓ Model loaded with {len(self.feature_columns)} features (model: {MODEL_PATH.name})")
 
         except Exception as e:
             logger.error(f"Failed to load: {e}")
