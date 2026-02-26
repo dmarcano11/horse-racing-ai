@@ -1,36 +1,45 @@
 package com.horseracing.api.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.horseracing.api.entity.Runner;
 import com.horseracing.api.repository.RunnerRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class PredictionService {
 
+    private static final int SNIPPET_LEN = 400;
+
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private final RunnerRepository runnerRepository;
 
     @Value("${ML_SERVICE_URL:http://localhost:5001}")
     private String mlServiceUrl;
 
-    public PredictionService(RunnerRepository runnerRepository) {
+    public PredictionService(RunnerRepository runnerRepository, ObjectMapper objectMapper) {
         this.restTemplate = new RestTemplate();
+        this.objectMapper = objectMapper;
         this.runnerRepository = runnerRepository;
     }
 
     public boolean isHealthy() {
         try {
-            ResponseEntity<Map> response = restTemplate.getForEntity(
+            ResponseEntity<String> response = restTemplate.getForEntity(
                     mlServiceUrl + "/health",
-                    Map.class
+                    String.class
             );
-            return response.getStatusCode() == HttpStatus.OK;
+            return response.getStatusCode() == HttpStatus.OK && isJson(response.getBody());
         } catch (Exception e) {
             log.warn("ML service health check failed: {}", e.getMessage());
             return false;
@@ -41,13 +50,10 @@ public class PredictionService {
         // Try full feature pipeline first
         try {
             log.info("Attempting full feature prediction for race {}", raceId);
-            ResponseEntity<Map> response = restTemplate.getForEntity(
-                    mlServiceUrl + "/predict/race/" + raceId,
-                    Map.class
-            );
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+            Map<String, Object> result = callMlServiceGet(mlServiceUrl + "/predict/race/" + raceId);
+            if (result != null) {
                 log.info("✓ Full feature prediction successful for race {}", raceId);
-                return response.getBody();
+                return result;
             }
         } catch (Exception e) {
             log.warn("Full feature prediction failed, falling back: {}", e.getMessage());
@@ -97,6 +103,33 @@ public class PredictionService {
         return features;
     }
 
+    /**
+     * Call ML service GET and parse JSON. If response is HTML or non-JSON, logs snippet and throws.
+     * On 4xx/5xx returns null so caller can fall back to basic prediction.
+     */
+    private Map<String, Object> callMlServiceGet(String url) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    request,
+                    String.class
+            );
+            return parseMlResponse(url, response.getStatusCode(), response.getBody(), response.getHeaders().getContentType());
+        } catch (HttpStatusCodeException e) {
+            String snippet = e.getResponseBodyAsString();
+            if (snippet != null && snippet.length() > SNIPPET_LEN) {
+                snippet = snippet.substring(0, SNIPPET_LEN) + "...";
+            }
+            log.warn("ML GET {} failed: {} - body: {}", url, e.getStatusCode(), snippet);
+            return null;
+        }
+    }
+
     private Map<String, Object> callMlServicePost(
             Long raceId,
             List<Map<String, Object>> runners
@@ -104,6 +137,7 @@ public class PredictionService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
             Map<String, Object> body = new HashMap<>();
             body.put("race_id", raceId);
@@ -111,26 +145,58 @@ public class PredictionService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-            ResponseEntity<Map> response = restTemplate.postForEntity(
+            ResponseEntity<String> response = restTemplate.exchange(
                     mlServiceUrl + "/predict/race",
+                    HttpMethod.POST,
                     request,
-                    Map.class
+                    String.class
             );
 
-            // Add null check
-            if (response.getBody() == null) {
-                log.error("ML service returned null body for race {}", raceId);
+            Map<String, Object> result = parseMlResponse(
+                    mlServiceUrl + "/predict/race",
+                    response.getStatusCode(),
+                    response.getBody(),
+                    response.getHeaders().getContentType()
+            );
+            if (result == null) {
                 throw new RuntimeException("ML service returned empty response");
             }
-
-            Map<String, Object> result = new HashMap<>(response.getBody());
             result.put("note", "Basic prediction using morning line odds only");
             result.put("features", "basic");
             return result;
 
+        } catch (HttpStatusCodeException e) {
+            String snippet = e.getResponseBodyAsString();
+            if (snippet != null && snippet.length() > SNIPPET_LEN) {
+                snippet = snippet.substring(0, SNIPPET_LEN) + "...";
+            }
+            log.error("ML service call failed: {} {} - body: {}", e.getStatusCode(), e.getStatusText(), snippet);
+            throw new RuntimeException("ML service unavailable: " + e.getStatusCode() + " " + e.getStatusText() + " (check ML_SERVICE_URL and that ml-service returns JSON)");
         } catch (Exception e) {
             log.error("ML service call failed: {}", e.getMessage());
             throw new RuntimeException("ML service unavailable: " + e.getMessage());
         }
+    }
+
+    private Map<String, Object> parseMlResponse(String url, HttpStatus status, String body, MediaType contentType) {
+        if (body == null || body.isBlank()) {
+            log.error("ML service returned null/empty body for {} (status={})", url, status);
+            return null;
+        }
+        if (!isJson(body)) {
+            String snippet = body.length() > SNIPPET_LEN ? body.substring(0, SNIPPET_LEN) + "..." : body;
+            log.error("ML service returned non-JSON (content-type={}) for {}. Snippet: {}", contentType, url, snippet);
+            throw new RuntimeException("ML service returned HTML or non-JSON (check ML_SERVICE_URL points to ml-service and service is running)");
+        }
+        try {
+            return objectMapper.readValue(body, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            log.error("Failed to parse ML response as JSON: {}", e.getMessage());
+            throw new RuntimeException("ML service returned invalid JSON: " + e.getMessage());
+        }
+    }
+
+    private static boolean isJson(String body) {
+        return body != null && body.trim().startsWith("{");
     }
 }
