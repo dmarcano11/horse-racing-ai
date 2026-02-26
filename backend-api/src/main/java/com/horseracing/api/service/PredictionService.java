@@ -178,7 +178,7 @@ public class PredictionService {
         }
     }
 
-    private Map<String, Object> parseMlResponse(String url, HttpStatus status, String body, MediaType contentType) {
+    private Map<String, Object> parseMlResponse(String url, HttpStatusCode status, String body, MediaType contentType) {
         if (body == null || body.isBlank()) {
             log.error("ML service returned null/empty body for {} (status={})", url, status);
             return null;
