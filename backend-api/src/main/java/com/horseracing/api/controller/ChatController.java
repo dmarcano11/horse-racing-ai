@@ -2,6 +2,7 @@ package com.horseracing.api.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -16,7 +17,9 @@ import java.util.Map;
 public class ChatController {
 
     private final RestTemplate restTemplate;
-    private static final String MCP_SERVICE_URL = "http://localhost:5002";
+
+    @Value("${MCP_SERVICE_URL:http://localhost:5002}")
+    private String mcpServiceUrl;
 
     public ChatController() {
         this.restTemplate = new RestTemplate();
@@ -35,7 +38,7 @@ public class ChatController {
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    MCP_SERVICE_URL + "/chat",
+                    mcpServiceUrl + "/chat",
                     entity,
                     Map.class
             );
@@ -55,7 +58,7 @@ public class ChatController {
     public ResponseEntity<Map> health() {
         try {
             ResponseEntity<Map> response = restTemplate.getForEntity(
-                    MCP_SERVICE_URL + "/health",
+                    mcpServiceUrl + "/health",
                     Map.class
             );
             return ResponseEntity.ok(response.getBody());
