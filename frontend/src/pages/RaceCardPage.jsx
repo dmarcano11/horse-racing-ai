@@ -55,7 +55,7 @@ export default function RaceCardPage() {
                 Race {race.raceNumber}
               </span>
               {race.grade && (
-                <span className="font-mono text-[9px] px-2 py-1 rounded" style={{
+                <span className="font-mono text-xs px-2 py-1 rounded" style={{
                   background: 'rgba(196,158,66,0.1)',
                   color: 'var(--gold)',
                   border: '1px solid var(--border)'
@@ -64,7 +64,7 @@ export default function RaceCardPage() {
                 </span>
               )}
               {hasResults && (
-                <span className="font-mono text-[8px] px-3 py-1 rounded-full" style={{
+                <span className="font-mono text-xs px-3 py-1 rounded-full" style={{
                   background: 'var(--green-dim)',
                   color: 'var(--green)',
                   border: '1px solid rgba(60,184,122,0.25)'
@@ -83,10 +83,10 @@ export default function RaceCardPage() {
             </div>
           </div>
           <div className="text-right">
-            <div className="font-display text-lg font-semibold mb-1" style={{ color: 'var(--gold)' }}>
+            <div className="font-display text-xl font-semibold mb-1" style={{ color: 'var(--gold)' }}>
               {formatPurse(race.purse)}
             </div>
-            <div className="font-mono text-[9px]" style={{ color: 'var(--muted)' }}>Purse</div>
+            <div className="font-mono text-sm" style={{ color: 'var(--muted)' }}>Purse</div>
           </div>
         </div>
 
@@ -99,10 +99,10 @@ export default function RaceCardPage() {
             { label: 'Class', value: race.raceClass || '—' },
           ].map(item => (
             <div key={item.label}>
-              <div className="font-mono text-[8px] tracking-[0.2em] uppercase mb-1" style={{ color: 'var(--muted)' }}>
+              <div className="font-mono text-xs tracking-[0.2em] uppercase mb-1" style={{ color: 'var(--muted)' }}>
                 {item.label}
               </div>
-              <div className="font-mono font-medium" style={{ color: 'var(--cream)' }}>{item.value}</div>
+              <div className="font-mono text-sm font-medium" style={{ color: 'var(--cream)' }}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -119,7 +119,7 @@ export default function RaceCardPage() {
             ML Predictions Active
           </span>
           <span style={{ color: 'var(--muted)' }}>·</span>
-          <span className="font-mono text-xs" style={{ color: 'var(--slate)' }}>
+          <span className="font-mono text-sm" style={{ color: 'var(--slate)' }}>
             Random Forest · 0.604 ROC-AUC · 55 Features
           </span>
         </div>

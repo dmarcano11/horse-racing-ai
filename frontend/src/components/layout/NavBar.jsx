@@ -110,7 +110,7 @@ export default function NavBar() {
         >
           <NavLink
             to="/chat"
-            className="font-mono text-[10px] tracking-[0.15em] uppercase px-4 py-3 rounded"
+            className="font-mono text-xs tracking-[0.15em] uppercase px-4 py-3 rounded"
             style={{
               color: location.pathname === '/chat' ? 'var(--gold)' : 'var(--slate)',
               background: location.pathname === '/chat' ? 'rgba(196,158,66,0.08)' : 'transparent',
@@ -122,7 +122,7 @@ export default function NavBar() {
           </NavLink>
           <NavLink
             to="/races"
-            className="font-mono text-[10px] tracking-[0.15em] uppercase px-4 py-3 rounded"
+            className="font-mono text-xs tracking-[0.15em] uppercase px-4 py-3 rounded"
             style={{
               color: location.pathname === '/races' ? 'var(--gold)' : 'var(--slate)',
               background: location.pathname === '/races' ? 'rgba(196,158,66,0.08)' : 'transparent',
@@ -134,7 +134,7 @@ export default function NavBar() {
           </NavLink>
           <NavLink
             to="/results"
-            className="font-mono text-[10px] tracking-[0.15em] uppercase px-4 py-3 rounded"
+            className="font-mono text-xs tracking-[0.15em] uppercase px-4 py-3 rounded"
             style={{
               color: location.pathname === '/results' ? 'var(--gold)' : 'var(--slate)',
               background: location.pathname === '/results' ? 'rgba(196,158,66,0.08)' : 'transparent',

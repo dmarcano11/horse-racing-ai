@@ -31,7 +31,7 @@ export default function ProbabilityBar({ probability }) {
         />
       </div>
       <span 
-        className="font-mono text-[11px] min-w-[38px] text-right"
+        className="font-mono text-sm min-w-[38px] text-right"
         style={{ color: 'var(--gold)' }}
       >
         {pct}%

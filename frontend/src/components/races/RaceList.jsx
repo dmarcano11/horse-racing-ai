@@ -14,13 +14,13 @@ export default function RaceList({ races }) {
           background: 'rgba(0,0,0,0.2)'
         }}
       >
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Race</div>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Name</div>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Distance</div>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Surface</div>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Purse</div>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Status</div>
-        <div className="font-mono text-[11px] tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}></div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Race</div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Name</div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Distance</div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Surface</div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Purse</div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}>Status</div>
+        <div className="font-mono text-xs tracking-[0.2em] uppercase" style={{ color: 'var(--muted)' }}></div>
       </div>
 
       {/* Race Rows */}
@@ -61,7 +61,7 @@ export default function RaceList({ races }) {
               <div className="text-sm font-medium" style={{ color: 'var(--cream)' }}>
                 {race.raceName || `Race ${race.raceNumber}`}
               </div>
-              <div className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
+              <div className="text-sm mt-0.5" style={{ color: 'var(--muted)' }}>
                 {race.raceClass || race.raceType || '—'}
               </div>
             </div>

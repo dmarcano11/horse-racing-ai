@@ -37,7 +37,7 @@ export default function RaceCard({ race }) {
       </div>
 
       {/* Meta Info */}
-      <div className="font-mono text-[9px] mb-4" style={{ color: 'var(--muted)' }}>
+      <div className="font-mono text-xs mb-4" style={{ color: 'var(--muted)' }}>
         {race.trackName} · {race.distanceValue}{race.distanceUnit} · {race.surface}
       </div>
 
@@ -48,7 +48,7 @@ export default function RaceCard({ race }) {
       >
         {/* Purse */}
         <div
-          className="font-mono text-[10px] rounded px-2 py-1"
+          className="font-mono text-sm rounded px-2 py-1"
           style={{
             background: 'rgba(196,158,66,0.08)',
             border: '1px solid var(--border)',
@@ -59,7 +59,7 @@ export default function RaceCard({ race }) {
         </div>
 
         {/* Runners Count */}
-        <div className="font-mono text-[9px]" style={{ color: 'var(--muted)' }}>
+        <div className="font-mono text-xs" style={{ color: 'var(--muted)' }}>
           {race.numRunners || 0} runners
         </div>
       </div>

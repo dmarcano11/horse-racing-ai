@@ -1,7 +1,7 @@
 export default function ModelBadge() {
   return (
     <span 
-      className="inline-flex items-center gap-1 font-mono text-[7px] tracking-[0.1em] rounded-full"
+      className="inline-flex items-center gap-1 font-mono text-xs tracking-[0.1em] rounded-full"
       style={{
         color: 'var(--gold)',
         background: 'rgba(196,158,66,0.1)',

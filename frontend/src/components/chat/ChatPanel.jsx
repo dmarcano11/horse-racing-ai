@@ -31,7 +31,7 @@ function MessageBubble({ message }) {
         </div>
       )}
       <div 
-        className="max-w-[80%] px-4 py-3 font-body text-sm"
+        className="max-w-[80%] px-4 py-3 font-body text-base"
         style={{
           background: isUser ? 'rgba(196,158,66,0.10)' : 'var(--card)',
           border: `1px solid ${isUser ? 'var(--border-hi)' : 'var(--border)'}`,
@@ -135,7 +135,7 @@ export default function ChatPanel({ raceId = null, className = '' }) {
 
   return (
     <div 
-      className={`flex flex-col overflow-hidden ${className}`}
+      className={`flex flex-col min-h-0 overflow-hidden ${className}`}
       style={{
         background: 'var(--obsidian)',
         border: '1px solid rgba(196,158,66,0.12)',
@@ -151,7 +151,7 @@ export default function ChatPanel({ raceId = null, className = '' }) {
 
       {/* Header */}
       <div 
-        className="px-4 py-3 flex items-center gap-3"
+        className="flex-shrink-0 px-4 py-3 flex items-center gap-3"
         style={{ borderBottom: '1px solid var(--border)' }}
       >
         {/* Avatar with online dot */}
@@ -181,16 +181,16 @@ export default function ChatPanel({ raceId = null, className = '' }) {
         </div>
         
         <div className="flex-1">
-          <div className="font-display text-base" style={{ color: 'var(--cream)' }}>
+          <div className="font-display text-lg" style={{ color: 'var(--cream)' }}>
             AI Racing Expert
           </div>
-          <div className="font-mono text-[8px]" style={{ color: 'var(--muted)' }}>
+          <div className="font-mono text-sm" style={{ color: 'var(--muted)' }}>
             Online · {messages.length - 1} messages
           </div>
         </div>
 
         <div 
-          className="font-mono text-[8px] rounded-full px-3 py-1"
+          className="font-mono text-sm rounded-full px-3 py-1.5"
           style={{
             background: 'rgba(255,255,255,0.03)',
             border: '1px solid var(--border)',
@@ -201,10 +201,9 @@ export default function ChatPanel({ raceId = null, className = '' }) {
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messages - min-h-0 lets this shrink so input stays visible */}
       <div 
-        className="flex-1 overflow-y-auto p-4 space-y-4"
-        style={{ minHeight: '300px', maxHeight: '500px' }}
+        className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4"
       >
         {messages.map((msg, i) => (
           <MessageBubble key={i} message={msg} />
@@ -244,12 +243,12 @@ export default function ChatPanel({ raceId = null, className = '' }) {
 
       {/* Suggested Questions (show only at start) */}
       {messages.length === 1 && !raceId && (
-        <div className="px-4 pb-3 flex flex-wrap gap-2">
+        <div className="flex-shrink-0 px-4 pb-3 flex flex-wrap gap-2">
           {SUGGESTED_QUESTIONS.map(q => (
             <button
               key={q}
               onClick={() => sendMessage(q)}
-              className="font-mono text-[9px] px-3 py-1.5 rounded-full transition-all"
+              className="font-mono text-sm px-3 py-2 rounded-full transition-all"
               style={{
                 background: 'var(--card)',
                 border: '1px solid var(--border)',
@@ -272,9 +271,9 @@ export default function ChatPanel({ raceId = null, className = '' }) {
         </div>
       )}
 
-      {/* Input */}
+      {/* Input - flex-shrink-0 so it's never cut off */}
       <div 
-        className="p-4 flex gap-2"
+        className="flex-shrink-0 p-4 flex gap-2"
         style={{ 
           background: 'var(--surface)',
           borderTop: '1px solid var(--border)'
@@ -289,7 +288,7 @@ export default function ChatPanel({ raceId = null, className = '' }) {
             ? "Ask about this race..."
             : "Ask about races, predictions, strategy..."}
           disabled={loading}
-          className="flex-1 px-3 py-2 text-sm rounded-lg transition-all font-body"
+          className="flex-1 px-3 py-2.5 text-base rounded-lg transition-all font-body"
           style={{
             background: 'var(--card)',
             border: '1px solid var(--border)',

@@ -53,10 +53,10 @@ export default function RunnerRow({ runner, index, isTopPick, hasResults }) {
 
       {/* Jockey / Trainer */}
       <div>
-        <div className="font-mono text-[10px]" style={{ color: 'var(--cream)' }}>
+        <div className="font-mono text-sm" style={{ color: 'var(--cream)' }}>
           {runner.jockeyName || '—'}
         </div>
-        <div className="font-mono text-[9px] mt-0.5" style={{ color: 'var(--muted)' }}>
+        <div className="font-mono text-xs mt-0.5" style={{ color: 'var(--muted)' }}>
           {runner.trainerName || '—'}
         </div>
       </div>
