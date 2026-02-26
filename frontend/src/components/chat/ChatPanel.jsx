@@ -76,7 +76,11 @@ const SUGGESTED_QUESTIONS = [
   "What's a value bet?",
 ]
 
-export default function ChatPanel({ raceId = null, className = '' }) {
+const DEFAULT_MAX_HEIGHT_PX = 600
+/** Space reserved for header, input row, and optional suggested-questions so panel never exceeds max */
+const FIXED_CHROME_APPROX_PX = 168
+
+export default function ChatPanel({ raceId = null, className = '', dynamicHeight = false, maxHeight = DEFAULT_MAX_HEIGHT_PX }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -133,13 +137,16 @@ export default function ChatPanel({ raceId = null, className = '' }) {
     }
   }
 
+  const messagesMaxHeight = dynamicHeight ? maxHeight - FIXED_CHROME_APPROX_PX : undefined
+
   return (
     <div 
-      className={`flex flex-col min-h-0 overflow-hidden ${className}`}
+      className={`flex flex-col overflow-hidden ${dynamicHeight ? 'h-auto min-h-0' : 'min-h-0'} ${className}`}
       style={{
         background: 'var(--obsidian)',
         border: '1px solid rgba(196,158,66,0.12)',
         borderRadius: '16px',
+        ...(dynamicHeight && { maxHeight: `${maxHeight}px` })
       }}
     >
       {/* Top Border Glow */}
@@ -201,9 +208,10 @@ export default function ChatPanel({ raceId = null, className = '' }) {
         </div>
       </div>
 
-      {/* Messages - min-h-0 lets this shrink so input stays visible */}
+      {/* Messages - in dynamic mode height grows with content up to messagesMaxHeight, then scrolls */}
       <div 
-        className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4"
+        className={`overflow-y-auto p-4 space-y-4 ${dynamicHeight ? 'flex-shrink-0' : 'flex-1 min-h-0'}`}
+        style={dynamicHeight ? { maxHeight: `${messagesMaxHeight}px` } : undefined}
       >
         {messages.map((msg, i) => (
           <MessageBubble key={i} message={msg} />

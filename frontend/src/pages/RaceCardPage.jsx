@@ -170,7 +170,12 @@ export default function RaceCardPage() {
         <h2 className="font-display text-lg font-semibold mb-3" style={{ color: 'var(--cream)' }}>
           Ask the AI Expert
         </h2>
-        <ChatPanel raceId={parseInt(raceId)} className="h-[420px]" />
+        <ChatPanel
+          raceId={parseInt(raceId)}
+          dynamicHeight
+          maxHeight={600}
+          className="min-h-[320px] w-full"
+        />
       </div>
 
     </div>
